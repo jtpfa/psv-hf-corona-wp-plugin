@@ -11,6 +11,7 @@ if (!defined('ABSPATH')) {
 }
 
 include('anwesenheitsliste-helper.php');
+include_once('corona.php');
 
 if (isset($_POST['generate_pdf'])) {
     generate_pdf();
@@ -25,13 +26,56 @@ function anwesenheitsliste_create_admin_menu()
         'Anwesenheitsliste',
         'manage_options',
         'anwesenheitsliste',
-        'anwesenheitsliste__create_admin_page'
+        'anwesenheitsliste_create_admin_page'
     );
 }
 
-function generate_pdf() {
+function cron_activation()
+{
+    if (!wp_next_scheduled('delete_old_entries')) {
+        wp_schedule_event(time(), 'daily', 'delete_old_entries');
+    }
+}
+
+add_action('wp', 'cron_activation');
+
+function cron_deactivation()
+{
+    $timestamp = wp_next_scheduled('delete_old_entries');
+    wp_unschedule_event($timestamp, 'delete_old_entries');
+}
+
+register_deactivation_hook(__FILE__, 'cron_deactivation');
+
+function cleanup_entries() {
     global $wpdb;
-    $result = $wpdb->get_results('SELECT CONCAT(nachname, \', \', vorname) as name, telefon, CONCAT(straße,\' \', nummer, \'\,\', plz, \' \', ort) as adresse, CONCAT(datum_von, \' \', uhrzeit_von) as ankunft, COALESCE(CONCAT(datum_bis, \' \', uhrzeit_bis), \'Noch vor Ort\') as abfahrt, aktiv FROM ' . $wpdb->base_prefix . 'corona_anwesenheitsliste', ARRAY_N);
+    $wpdb->query('DELETE FROM ' . $wpdb->base_prefix . 'corona_anwesenheitsliste WHERE aktiv <> 1 AND TIMESTAMPDIFF(DAY, bis, CURRENT_TIMESTAMP()) > 21');
+}
+
+add_action ('delete_old_entries', 'cleanup_entries');
+
+function load_vuescripts()
+{
+    wp_register_script('anwesenheitsliste_vuejs', plugin_dir_url(__FILE__) . '/js/vue.js');
+    wp_register_script('anwesenheitsliste_vueappjs', plugin_dir_url(__FILE__) . '/js/app.js', 'anwesenheitsliste_vuejs', false, true);
+}
+
+add_action('wp_enqueue_scripts', 'load_vuescripts');
+
+function shortcode_anwesenheitsliste(): string
+{
+    wp_enqueue_script('anwesenheitsliste_vuejs');
+    wp_enqueue_script('anwesenheitsliste_vueappjs');
+
+    return "<div id='app'></div>";
+}
+
+add_shortcode('anwesenheitsliste', 'shortcode_anwesenheitsliste');
+
+function generate_pdf()
+{
+    global $wpdb;
+    $result = $wpdb->get_results('SELECT CONCAT(nachname, \', \', vorname) as name, telefon, CONCAT(straße,\' \', nummer, \'\,\', plz, \' \', ort) as adresse, von as ankunft, COALESCE(bis, \'Noch da\') as abfahrt, aktiv FROM ' . $wpdb->base_prefix . 'corona_anwesenheitsliste', ARRAY_N);
 
     if (isset($result)) {
         $pdf = new PDF();
@@ -90,7 +134,7 @@ function output_pdf($data, $pdf, $page = 1)
         }
 
         if ($page_break) {
-            $remaining_data = array_slice($rows, -(count($rows)-$jj-1));
+            $remaining_data = array_slice($rows, -(count($rows) - $jj - 1));
             output_pdf($remaining_data, $pdf, ++$page);
         }
 
@@ -101,7 +145,7 @@ function output_pdf($data, $pdf, $page = 1)
 }
 
 
-function anwesenheitsliste__create_admin_page()
+function anwesenheitsliste_create_admin_page()
 {
     ?>
     <div class="wrap">

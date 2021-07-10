@@ -30,7 +30,7 @@ class PDF extends FPDF
             "SetTextColor (0, 0, 0);",
             "SetFont (\"Times\", \"B\", 24);",
             "Text (180, 15,\"Anwesenheitsliste\");",
-            "SetColumns  (\"COLSWDTH\", 125, 40, 170, 34, 34);",
+            "SetColumns  (\"COLSWDTH\", 122, 38, 167, 38, 38);",
             "SetTextProp (\"ROW0COL0\", 5, 25, -1, 8, 0, 0, 0, \"Arial\", \"I\", 11);",
             "SetTextProp (\"ROW1COL0\", 5, 34, -1, 6, 0, 0, 0, \"Courier\", \"B\", 9);"
         );

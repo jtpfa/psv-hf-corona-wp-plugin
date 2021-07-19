@@ -28,15 +28,15 @@ const app = new Vue({
         }
     },
     mounted() {
-        const user = localStorage.getItem('user')
+        const user = localStorage.getItem('user') || Vue.$cookies.get('user')
         if (user) {
-            this.user = JSON.parse(user)
+           this.user = localStorage.getItem('user') ? JSON.parse(user) : user
         }
-        this.active = localStorage.getItem('active') || ''
+        this.active = localStorage.getItem('active') || Vue.$cookies.get('active') || ''
     },
     methods: {
         isHoneypotFilled() {
-            return this.name.length || this.email.length
+            return false
         },
         async submit() {
             this.loading = true
@@ -50,6 +50,7 @@ const app = new Vue({
             } else {
                 const dataAsString = JSON.stringify(this.user)
                 localStorage.setItem('user', dataAsString)
+                this.$cookies.set('user', dataAsString, Infinity)
 
                 fetch('/wp-json/corona/in', {
                     method: 'POST',
@@ -70,6 +71,7 @@ const app = new Vue({
                             hour: 'numeric', minute: 'numeric', second: 'numeric',
                         }).format(new Date())
                         localStorage.setItem('active', date)
+                        this.$cookies.set('active', date, Infinity)
                         this.active = date
                     })
                     .catch(e => {
@@ -98,6 +100,7 @@ const app = new Vue({
                     }
 
                     localStorage.removeItem('active')
+                    this.$cookies.remove('active')
                     this.active = ''
                 })
                 .catch(e => {

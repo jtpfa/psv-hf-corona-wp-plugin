@@ -51,7 +51,7 @@ function sign_user_out($request)
     $entry = prepare_data($request, 'out', 'Die Austragung hat nicht funktioniert.');
 
     if ($entry instanceof WP_Error) {
-        return $entry;
+        return rest_ensure_response(new WP_Error(500,'Die Austragung funktioniert gerade nicht.'));
     }
 
     setlocale(LC_TIME, 'de_DE');
@@ -65,7 +65,7 @@ function sign_user_out($request)
     global $wpdb;
     $result = $wpdb->update($wpdb->base_prefix . 'corona_anwesenheitsliste', $update, $entry);
     if ($result === 0 || !$result) {
-        return rest_ensure_response(new WP_Error(500, $wpdb, ''));
+        return rest_ensure_response(new WP_Error(500, 'Die Austragung hat leider nicht funktioniert.'));
     }
 
     return rest_ensure_response('');

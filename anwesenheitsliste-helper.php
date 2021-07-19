@@ -1,7 +1,7 @@
 <?php
-require_once('pdf_creator/fpdf.php');
+require_once('tfpdf/tfpdf.php');
 
-class PDF extends FPDF
+class PDF extends tFPDF
 {
     protected $columnss = array();    // array of columns anchors
     protected $textprops = array();    // array of text anchors
@@ -24,15 +24,15 @@ class PDF extends FPDF
             "SetFillColor (200, 255, 160);",
             "SetLineWidth (0.5);",
             "Line (10, 280, 410, 280);",
-            "SetFont (\"Courier\", \"I\", 10);",
+            "SetFont (\"DejaVu\", \"\", 10);",
             "Text (10, 290, \"$footer_left\");",
-            "SetTextProp (\"FOOTRNB2\", 398, 290, -1, -1, 0, 0, 0,\"Courier\", \"I\", 9);",
+            "SetTextProp (\"FOOTRNB2\", 398, 290, -1, -1, 0, 0, 0,\"DejaVu\", \"\", 9);",
             "SetTextColor (0, 0, 0);",
-            "SetFont (\"Times\", \"B\", 24);",
+            "SetFont (\"DejaVu\", \"\", 24);",
             "Text (180, 15,\"Anwesenheitsliste\");",
             "SetColumns  (\"COLSWDTH\", 122, 38, 167, 38, 38);",
-            "SetTextProp (\"ROW0COL0\", 5, 25, -1, 8, 0, 0, 0, \"Arial\", \"I\", 11);",
-            "SetTextProp (\"ROW1COL0\", 5, 34, -1, 6, 0, 0, 0, \"Courier\", \"B\", 9);"
+            "SetTextProp (\"ROW0COL0\", 5, 25, -1, 8, 0, 0, 0, \"DejaVu\", \"\", 11);",
+            "SetTextProp (\"ROW1COL0\", 5, 34, -1, 6, 0, 0, 0, \"DejaVu\", \"\", 9);"
         );
 
         $this->flag_template = $this->template;

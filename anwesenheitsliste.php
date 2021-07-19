@@ -2,7 +2,7 @@
 /*
 * Plugin Name: Anwesenheitsliste
 * Description: Exportiert alle Besucher:innen der vergangenen 3 Wochen als PDF.
-* Version: 1.0
+* Version: 1.1.3
 * Author: Jonas Pfannkuche
 */
 
@@ -57,7 +57,8 @@ add_action ('delete_old_entries', 'cleanup_entries');
 function load_vuescripts()
 {
     wp_register_script('anwesenheitsliste_vuejs', plugin_dir_url(__FILE__) . '/js/vue.js');
-    wp_register_script('anwesenheitsliste_vueappjs', plugin_dir_url(__FILE__) . '/js/app.js', 'anwesenheitsliste_vuejs', false, true);
+    wp_register_script('anwesenheitsliste_vuecookiesjs', plugin_dir_url(__FILE__) . '/js/vue-cookies.js', 'anwesenheitsliste_vuejs', false);
+    wp_register_script('anwesenheitsliste_vueappjs', plugin_dir_url(__FILE__) . '/js/app.js', ['anwesenheitsliste_vuejs', 'anwesenheitsliste_vuecookiesjs'], false, true);
 }
 
 add_action('wp_enqueue_scripts', 'load_vuescripts');
@@ -65,7 +66,15 @@ add_action('wp_enqueue_scripts', 'load_vuescripts');
 function shortcode_anwesenheitsliste(): string
 {
     wp_enqueue_script('anwesenheitsliste_vuejs');
+    wp_enqueue_script('anwesenheitsliste_vuecookiesjs');
     wp_enqueue_script('anwesenheitsliste_vueappjs');
+
+    $user = wp_get_current_user();
+    if (array_intersect(['administrator'], $user->roles)) {
+        // @TODO
+        return "<div id='app'></div>";
+    }
+
 
     return "<div id='app'></div>";
 }
@@ -80,6 +89,8 @@ function generate_pdf()
     if (isset($result)) {
         $pdf = new PDF();
         $pdf->AliasNbPages("{nb}");
+        $pdf->AddFont('DejaVu','','DejaVuSansCondensed.ttf',true);
+        $pdf->SetFont('DejaVu','',10);
 
         output_pdf($result, $pdf);
     }

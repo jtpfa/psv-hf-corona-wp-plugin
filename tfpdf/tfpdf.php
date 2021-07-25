@@ -530,7 +530,7 @@ function AddFont($family, $style='', $file='', $uni=false)
 			unset($ttf);
 		}
 		else {
-			$cw = @file_get_contents($unifilename.'.cw.dat'); 
+			$cw = @file_get_contents($unifilename.'.cw.dat');
 		}
 		$i = count($this->fonts)+1;
 		if(!empty($this->AliasNbPages))
@@ -658,7 +658,7 @@ function Text($x, $y, $txt)
 		foreach($this->UTF8StringToArray($txt) as $uni)
 			$this->CurrentFont['subset'][$uni] = $uni;
 	}
-	else 
+	else
 		$txt2 = '('.$this->_escape($txt).')';
 	$s = sprintf('BT %.2F %.2F Td %s Tj ET',$x*$this->k,($this->h-$y)*$this->k,$txt2);
 	if($this->underline && $txt!='')
@@ -1912,7 +1912,7 @@ protected function _putfonts()
 			$this->_put('<</Type /Font');
 			$this->_put('/Subtype /Type0');
 			$this->_put('/BaseFont /'.$fontname.'');
-			$this->_put('/Encoding /Identity-H'); 
+			$this->_put('/Encoding /Identity-H');
 			$this->_put('/DescendantFonts ['.($this->n + 1).' 0 R]');
 			$this->_put('/ToUnicode '.($this->n + 2).' 0 R');
 			$this->_put('>>');
@@ -1924,10 +1924,10 @@ protected function _putfonts()
 			$this->_put('<</Type /Font');
 			$this->_put('/Subtype /CIDFontType2');
 			$this->_put('/BaseFont /'.$fontname.'');
-			$this->_put('/CIDSystemInfo '.($this->n + 2).' 0 R'); 
+			$this->_put('/CIDSystemInfo '.($this->n + 2).' 0 R');
 			$this->_put('/FontDescriptor '.($this->n + 3).' 0 R');
 			if (isset($font['desc']['MissingWidth'])){
-				$this->_out('/DW '.$font['desc']['MissingWidth'].''); 
+				$this->_out('/DW '.$font['desc']['MissingWidth'].'');
 			}
 
 			$this->_putTTfontwidths($font, $ttf->maxUni);
@@ -1964,7 +1964,7 @@ protected function _putfonts()
 
 			// CIDSystemInfo dictionary
 			$this->_newobj();
-			$this->_put('<</Registry (Adobe)'); 
+			$this->_put('<</Registry (Adobe)');
 			$this->_put('/Ordering (UCS)');
 			$this->_put('/Supplement 0');
 			$this->_put('>>');
@@ -1998,7 +1998,7 @@ protected function _putfonts()
 			$this->_putstream($cidtogidmap);
 			$this->_put('endobj');
 
-			//Font file 
+			//Font file
 			$this->_newobj();
 			$this->_put('<</Length '.strlen($fontstream));
 			$this->_put('/Filter /FlateDecode');
@@ -2007,7 +2007,7 @@ protected function _putfonts()
 			$this->_putstream($fontstream);
 			$this->_put('endobj');
 			unset($ttf);
-		} 
+		}
 		else
 		{
 			// Allow for additional types
@@ -2033,7 +2033,7 @@ protected function _putTTfontwidths(&$font, $maxUni) {
 		$interval = false;
 		$startcid = 1;
 	}
-	$cwlen = $maxUni + 1; 
+	$cwlen = $maxUni + 1;
 
 	// for each character
 	for ($cid=$startcid; $cid<$cwlen; $cid++) {
@@ -2052,7 +2052,7 @@ protected function _putTTfontwidths(&$font, $maxUni) {
 				fclose($fh);
 			}
 		}
-		if ((!isset($font['cw'][$cid*2]) || !isset($font['cw'][$cid*2+1])) || 
+		if ((!isset($font['cw'][$cid*2]) || !isset($font['cw'][$cid*2+1])) ||
                     ($font['cw'][$cid*2] == "\00" && $font['cw'][$cid*2+1] == "\00")) { continue; }
 
 		$width = (ord($font['cw'][$cid*2]) << 8) + ord($font['cw'][$cid*2+1]);

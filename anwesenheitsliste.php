@@ -2,7 +2,7 @@
 /*
 * Plugin Name: Anwesenheitsliste
 * Description: Exportiert alle Besucher:innen der vergangenen 3 Wochen als PDF.
-* Version: 1.1.3
+* Version: 1.2.1
 * Author: Jonas Pfannkuche
 */
 
@@ -49,7 +49,7 @@ register_deactivation_hook(__FILE__, 'cron_deactivation');
 
 function cleanup_entries() {
     global $wpdb;
-    $wpdb->query('DELETE FROM ' . $wpdb->base_prefix . 'corona_anwesenheitsliste WHERE aktiv <> 1 AND TIMESTAMPDIFF(DAY, bis, CURRENT_TIMESTAMP()) > 21');
+    $wpdb->query('DELETE FROM ' . $wpdb->base_prefix . 'corona_anwesenheitsliste WHERE aktiv <> 1 AND TIMESTAMPDIFF(DAY, von, CURRENT_TIMESTAMP()) > 21');
 }
 
 add_action ('delete_old_entries', 'cleanup_entries');
@@ -84,7 +84,7 @@ add_shortcode('anwesenheitsliste', 'shortcode_anwesenheitsliste');
 function generate_pdf()
 {
     global $wpdb;
-    $result = $wpdb->get_results('SELECT CONCAT(nachname, \', \', vorname) as name, telefon, CONCAT(straße,\' \', nummer, \'\,\', plz, \' \', ort) as adresse, von as ankunft, COALESCE(bis, \'Noch da\') as abfahrt, aktiv FROM ' . $wpdb->base_prefix . 'corona_anwesenheitsliste', ARRAY_N);
+    $result = $wpdb->get_results('SELECT CONCAT(nachname, \', \', vorname) as name, telefon, CONCAT(straße,\' \', nummer, \'\, \', plz, \' \', ort) as adresse,  DATE_FORMAT(von, \'%d.%m.%Y %T\')  as ankunft, COALESCE(DATE_FORMAT(bis, \'%d.%m.%Y %T\'), \'Noch da\') as abfahrt, aktiv FROM ' . $wpdb->base_prefix . 'corona_anwesenheitsliste', ARRAY_N);
 
     if (isset($result)) {
         $pdf = new PDF();
